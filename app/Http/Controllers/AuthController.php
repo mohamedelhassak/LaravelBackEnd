@@ -104,5 +104,10 @@ class AuthController extends Controller
  
         return response()->json(['token' => $token], 200);
      }
+
+ public function test()
+    {
+        return response()->json(['test' => 'test tes test'], 200);
+    }
     
 }
