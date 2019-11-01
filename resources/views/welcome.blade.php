@@ -81,7 +81,7 @@
 
             <div class="content">
                 <div class="title m-b-md">
-                    Backend wirtingApp
+                    Backend wirtingApp mobile app
                 </div>
 
                 <div class="links">
