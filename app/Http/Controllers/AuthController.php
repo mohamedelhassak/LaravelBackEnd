@@ -16,13 +16,12 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255',
             'password' => 'required|string|min:6',
-            'native_lang' => 'required',
-            'other_lang' => 'required',
+            
         ]);
     
         if ($valid->fails()) {
-            $jsonError=response()->json($valid->errors()->all(), 400);
-            return \Response::json($jsonError);
+            return response()->json($valid->errors()->all(), 400);
+            
         }
     
         $data = request()->only('email','name','password','native_lang','other_lang');
@@ -39,7 +38,7 @@ class AuthController extends Controller
     
         $token = $user->createToken('TutsForWeb')->accessToken;
  
-        return response()->json(['token' => $token], 200);
+        return response()->json(['token' => $token,'user'=>$user], 200);
      }
 
      public function login(Request $request)
@@ -53,7 +52,7 @@ class AuthController extends Controller
         
         if (auth()->attempt($credentials)) {
             $token = auth()->user()->createToken('TutsForWeb')->accessToken;
-            return response()->json(['token' => $token], 200);
+            return response()->json(['token' => $token,'user'=>auth()->user()], 200);
         } else {
             return response()->json(['error' => 'UnAuthorised'], 401);
         }
@@ -70,14 +69,25 @@ class AuthController extends Controller
         return response()->json(['user' => auth()->user()], 200);
     }
 
+     public function checkEmail(Request $request)
+    {
+	if (User::where('email', '=', $request->email)->count() > 0) {
+   	// user found
+return response()->json(['status' => 'email already exist'], 200);
+	}else {
+return response()->json(['status' => 'email not found'], 404);
+}
+        
+    }
+
 
     function editProfile(Request $request){
         $valid = validator($request->only('email', 'name', 'password','native_lang','other_lang'), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255',
             'password' => 'required|string|min:6',
-            'native_lang' => 'required',
-            'other_lang' => 'required',
+            'native_lang' => 'required|string',
+            'other_lang' => 'required|string',
         ]);
     
         if ($valid->fails()) {
@@ -105,9 +115,10 @@ class AuthController extends Controller
         return response()->json(['token' => $token], 200);
      }
 
- public function test()
+ public function show($id)
     {
-        return response()->json(['test' => 'test tes test'], 200);
+        $user = User::find($id);
+        return response()->json([$user], 200);
     }
     
 }

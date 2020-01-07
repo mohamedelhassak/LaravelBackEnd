@@ -21,19 +21,18 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
     Route::post('login', 'AuthController@login');
     Route::post('register', 'AuthController@register');
-
-    
-    
+    Route::post('checkEmail', 'AuthController@checkEmail');
 
 
-     
+
     Route::middleware('auth:api')->group(function () {
         Route::get('user', 'AuthController@details');
+        Route::get('user/{id}', 'AuthController@show');
         Route::get('logout', 'AuthController@logout');
         Route::put('editProfile', 'AuthController@editProfile');
         //writing routes
-        Route::get('writing', 'WritingController@index');
         Route::get('writing/{id}', 'WritingController@show');
+        Route::get('writings/{lang}', 'WritingController@index');
         Route::post('writing', 'WritingController@store');
         Route::delete('writing/{id}', 'WritingController@destroy');
         Route::put('writing/{id}', 'WritingController@update');

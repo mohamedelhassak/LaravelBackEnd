@@ -12,12 +12,13 @@ class WritingController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($lang)
     {
-        //$writings = Writing::cursor();
-        $writings = auth()->user()->writings;
+        $writings = Writing::where('lang', $lang)
+        ->orderBy('created_at', 'desc')
+        ->get();
 
-        return response()->json(['writing'=>$writings,'status'=>200]);
+        return response()->json($writings);
     }
 
     /**
@@ -42,22 +43,23 @@ class WritingController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string',
         ]);
-    
+
         if ($valid->fails()) {
             $jsonError=response()->json($valid->errors()->all(), 400);
             return \Response::json($jsonError);
         }
-    
-        $data = request()->only('title','content','created_at');
-    
+
+        $data = request()->all();
+
         $writing = Writing::create([
             'title' => $data['title'],
             'content' => $data['content'],
-            'created_at' => $data['created_at'],
-            'user_id' => auth()->user()->id,
+                        'user_id' => auth()->user()->id,
+            'lang' => $data['lang'],
+            'user_name' => $data['user_name'],
         ]);
 
- 
+
         return response()->json(['writing'=>$writing,'status' => 'Writing created']);
     }
 
@@ -100,20 +102,20 @@ class WritingController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string',
         ]);
-    
+
         if ($valid->fails()) {
             $jsonError=response()->json($valid->errors()->all(), 400);
             return \Response::json($jsonError);
         }
-    
+
         $data = request()->only('title','content','updated_at');
-    
-        
+
+
         $writing->title      = $data['title'];
         $writing->content    = $data['content'];
         $writing->updated_at = $data['updated_at'];
         $writing->save();
-    
+
         return response()->json(['writing'=>$writing,'status' => 'Writing updated']);
     }
 
@@ -126,7 +128,7 @@ class WritingController extends Controller
     public function destroy($id)
     {
         $writing = Writing::find($id);
-        
+
         $writing->delete();
 
         return response()->json(['writing'=>$writing,'status'=>'writing deleted']);
